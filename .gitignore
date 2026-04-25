@@ -1,0 +1,9 @@
+.env
+__pycache__/
+*.py[cod]
+venv/
+.ipynb_checkpoints/
+data/*
+!data/raw_samples/
+!data/pdf_reports/
+!data/.gitkeep
