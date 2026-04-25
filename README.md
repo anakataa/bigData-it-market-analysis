@@ -1,14 +1,14 @@
 # IT Job Market & Salary Analysis (Big Data Project)
 
-## 🎯 Project Overview
+##  Project Overview
 This project is a comprehensive end-to-end data engineering and analytics system designed to collect, process, and visualize IT job market data. The primary goal is to provide insights into salary trends and demand for technical skills across different regions and employment types.
 
-## 🚀 Key Objectives
+##  Key Objectives
 * **Salary Correlation**: Analyze the relationship between technology stacks and compensation levels.
 * **Demand Analysis**: Identify the most sought-after skills based on geographical location and work mode (Remote/Office).
 * **Predictive Modeling**: Develop a regression model to estimate potential salaries based on job features.
 
-## 🏗 System Architecture (AWS Stack)
+##  System Architecture (AWS Stack)
 The project is built using Amazon Web Services (AWS) and follows a 4-layer architecture:
 
 ### 1. Layer 1: Data Ingestion
@@ -26,7 +26,7 @@ The project is built using Amazon Web Services (AWS) and follows a 4-layer archi
 ### 4. Layer 4: Machine Learning
 * Regression model developed using **Scikit-learn** to predict salary ranges.
 
-## 📂 Project Structure
+##  Project Structure
 ```text
 BigData-IT-Market-Analysis/
 ├── data/                 # Sample data for local testing
