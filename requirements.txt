@@ -1,5 +1,8 @@
 boto3
-pyspark
 pandas
+numpy
 scikit-learn
+matplotlib
+seaborn
 pdfplumber
+pyspark
