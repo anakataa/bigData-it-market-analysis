@@ -1,44 +1,79 @@
 # IT Job Market & Salary Analysis (Big Data Project)
 
-##  Project Overview
-This project is a comprehensive end-to-end data engineering and analytics system designed to collect, process, and visualize IT job market data. The primary goal is to provide insights into salary trends and demand for technical skills across different regions and employment types.
+## Project Overview
 
-##  Key Objectives
-* **Salary Correlation**: Analyze the relationship between technology stacks and compensation levels.
-* **Demand Analysis**: Identify the most sought-after skills based on geographical location and work mode (Remote/Office).
-* **Predictive Modeling**: Develop a regression model to estimate potential salaries based on job features.
+This project is a cloud-based Big Data analytics platform designed to collect, process, analyze, and visualize IT job market data from multiple sources.
 
-##  System Architecture (AWS Stack)
-The project is built using Amazon Web Services (AWS) and follows a 4-layer architecture:
+The system focuses on identifying salary trends, technology demand, remote work impact, and global hiring patterns in the technology industry.
 
-### 1. Layer 1: Data Ingestion
-* Python scripts (**Boto3**) to collect data from APIs (JSON), Kaggle (CSV), and PDF reports.
-* Raw data storage in **Amazon S3 (Bronze Zone)**.
+Using AWS cloud technologies and modern data engineering practices, the platform processes large-scale datasets and transforms them into analytical dashboards and machine learning insights.
 
-### 2. Layer 2: Transformation
-* **AWS Glue (PySpark)** for data cleaning, currency normalization, and duplicate removal.
-* Data conversion to **Parquet** (columnar format) and storage in **Amazon S3 (Silver/Gold Zones)**.
+---
 
-### 3. Layer 3: Data Serving
-* **Amazon Athena** for SQL-based analysis.
-* Interactive dashboards created with **Amazon QuickSight** or **Tableau**.
+# Business Problem
 
-### 4. Layer 4: Machine Learning
-* Regression model developed using **Scikit-learn** to predict salary ranges.
+The modern IT job market changes rapidly across countries, technologies, and work formats. Developers, analysts, and companies often struggle to understand:
 
-##  Project Structure
+- Which technologies are most valuable
+- How remote work affects salaries
+- Which countries offer the best opportunities
+- Which skills are most demanded
+- How experience impacts compensation
+
+This project aims to solve these problems through scalable cloud analytics and machine learning.
+
+---
+
+# Project Goals
+
+- Build an end-to-end cloud data pipeline
+- Process large-scale job market datasets
+- Analyze salary and demand trends
+- Visualize insights through dashboards
+- Develop machine learning salary prediction models
+- Practice modern Big Data architecture using AWS
+
+---
+
+# Key Analytics Questions
+
+This project aims to answer the following questions:
+
+1. How does remote work affect salary levels in the IT industry?
+
+2. Which technologies and programming languages are the most in-demand?
+
+3. Which IT roles have the highest average salaries?
+
+4. How does experience level impact compensation?
+
+5. Which countries and regions offer the best salaries for tech specialists?
+
+6. Which technical skills frequently appear together in job postings?
+
+7. Can machine learning models predict salary ranges based on job features and skills?
+
+---
+
+# System Architecture (AWS Stack)
+
+The platform follows a modern cloud-native data lake architecture.
+
 ```text
-BigData-IT-Market-Analysis/
-├── data/                 # Sample data for local testing
-│   ├── raw_samples/      # Sample JSON/CSV files
-│   └── pdf_reports/      # Sample PDF files
-├── src/                  # Source code
-│   ├── 1_ingestion/      # Student 2: Data collection scripts
-│   ├── 2_transformation/ # Student 1: Spark ETL scripts
-│   ├── 3_serving/        # Student 3: SQL queries for Athena
-│   └── 4_ml/             # Student 3: ML models and notebooks
-├── dashboards/           # Visualization files or screenshots
-├── docs/                 # Project documentation and reports
-├── .gitignore            # AWS credential and data exclusion
-├── requirements.txt      # Project dependencies
-└── README.md             # Project roadmap and description
+Data Sources (APIs, Kaggle, CSV, PDFs)
+                    ↓
+          Amazon S3 (Bronze Layer)
+                    ↓
+        AWS Glue ETL Jobs (PySpark)
+                    ↓
+       Data Cleaning & Transformation
+                    ↓
+       Parquet Storage (Silver/Gold)
+                    ↓
+             AWS Glue Catalog
+                    ↓
+              Amazon Athena
+                    ↓
+         Amazon QuickSight BI
+                    ↓
+      Dashboards & ML Predictions
