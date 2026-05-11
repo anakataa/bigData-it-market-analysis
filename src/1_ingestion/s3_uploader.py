@@ -13,7 +13,7 @@ AWS_REGION = os.getenv("AWS_REGION")
 BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
 
 def get_s3_client():
-    """Инициализация клиента AWS S3"""
+    
     return boto3.client(
         's3',
         aws_access_key_id=AWS_ACCESS_KEY_ID,

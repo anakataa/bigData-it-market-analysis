@@ -7,3 +7,7 @@ data/*
 !data/raw_samples/
 !data/pdf_reports/
 !data/.gitkeep
+*.csv
+*.json
+*.parquet
+.DS_Store
