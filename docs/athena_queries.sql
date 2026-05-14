@@ -1,4 +1,14 @@
--- Average salary by role
+-- =========================================
+-- IT Job Market Analysis - Athena Queries
+-- AWS Athena / Presto SQL
+-- =========================================
+
+
+-- =========================================
+-- 1. Average salary by role
+-- Shows average salary for each job title
+-- =========================================
+
 SELECT
     job_title,
     AVG(salary) AS avg_salary
@@ -6,7 +16,12 @@ FROM cleaned_data
 GROUP BY job_title
 ORDER BY avg_salary DESC;
 
--- Top demanded skills
+
+-- =========================================
+-- 2. Top demanded technical skills
+-- UNNEST transforms skill arrays into rows
+-- =========================================
+
 SELECT
     skill,
     COUNT(*) AS demand
@@ -15,7 +30,12 @@ CROSS JOIN UNNEST(skills) AS t(skill)
 GROUP BY skill
 ORDER BY demand DESC;
 
--- Salary by skill
+
+-- =========================================
+-- 3. Average salary by skill
+-- Calculates compensation by technology
+-- =========================================
+
 SELECT
     skill,
     AVG(salary) AS avg_salary,
@@ -25,10 +45,46 @@ CROSS JOIN UNNEST(skills) AS t(skill)
 GROUP BY skill
 ORDER BY avg_salary DESC;
 
--- Job count by role
+
+-- =========================================
+-- 4. Job count by role
+-- Counts occurrences of cleaned job titles
+-- =========================================
+
 SELECT
     job_title_clean,
     COUNT(*) AS total_jobs
 FROM cleaned_data
 GROUP BY job_title_clean
 ORDER BY total_jobs DESC;
+
+
+-- =========================================
+-- 5. Salary statistics by currency
+-- Useful for international comparison
+-- =========================================
+
+SELECT
+    currency,
+    COUNT(*) AS total_jobs,
+    AVG(salary) AS avg_salary
+FROM cleaned_data
+GROUP BY currency;
+
+
+-- =========================================
+-- 6. Table schema inspection
+-- Displays Glue Catalog schema metadata
+-- =========================================
+
+DESCRIBE cleaned_data;
+
+
+-- =========================================
+-- 7. Dataset preview
+-- Shows sample records from the dataset
+-- =========================================
+
+SELECT *
+FROM cleaned_data
+LIMIT 10;
