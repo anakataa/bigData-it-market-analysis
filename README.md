@@ -1,44 +1,41 @@
-````md
 # IT Job Market & Salary Analysis (Big Data Project)
 
 ## Project Overview
 
-This project is a cloud-based Big Data analytics platform designed to collect, process, analyze, and visualize IT job market data from multiple sources.
+This project is focused on building a cloud-based Big Data analytics platform for analyzing the modern IT job market. The platform collects, processes, analyzes, and visualizes job-related data from multiple sources in order to identify salary trends, technology demand, and hiring patterns across the technology industry.
 
-The system focuses on identifying salary trends, technology demand, remote work impact, and global hiring patterns in the technology industry.
-
-Using AWS cloud technologies and modern data engineering practices, the platform processes large-scale datasets and transforms them into analytical dashboards and machine learning insights.
+Using AWS cloud technologies and modern data engineering tools, the project transforms raw datasets into analytical dashboards and machine learning insights.
 
 ---
 
 ## Business Problem
 
-The modern IT job market changes rapidly across countries, technologies, and work formats. Developers, analysts, and companies often struggle to understand:
+The global IT job market changes rapidly depending on technologies, work formats, and regional demand. Developers, analysts, and companies often struggle to understand:
 
-- Which technologies are most valuable
-- How remote work affects salaries
-- Which countries offer the best opportunities
-- Which skills are most demanded
-- How experience impacts compensation
+* which technologies are currently the most valuable,
+* how remote work impacts salaries,
+* which skills are most in demand,
+* which job roles offer the highest compensation,
+* and how salary trends change across different datasets.
 
-This project aims to solve these problems through scalable cloud analytics and machine learning.
+This project aims to solve these problems through scalable cloud analytics and machine learning techniques.
 
 ---
 
 ## Project Goals
 
-- Build an end-to-end cloud data pipeline
-- Process large-scale job market datasets
-- Analyze salary and demand trends
-- Visualize insights through dashboards
-- Develop machine learning salary prediction models
-- Practice modern Big Data architecture using AWS
+* Build an end-to-end cloud data pipeline
+* Process and clean large-scale job market datasets
+* Analyze salary and technology demand trends
+* Create analytical dashboards and visual reports
+* Develop salary prediction models using machine learning
+* Practice real-world Big Data architecture using AWS services
 
 ---
 
 ## Key Analytics Questions
 
-This project aims to answer the following questions:
+The project is designed to answer the following questions:
 
 1. How does remote work affect salary levels in the IT industry?
 2. Which technologies and programming languages are the most in-demand?
@@ -46,13 +43,13 @@ This project aims to answer the following questions:
 4. How does experience level impact compensation?
 5. Which countries and regions offer the best salaries for tech specialists?
 6. Which technical skills frequently appear together in job postings?
-7. Can machine learning models predict salary ranges based on job features and skills?
+7. Can machine learning models predict salary ranges based on job features and technical skills?
 
 ---
 
 ## System Architecture (AWS Stack)
 
-The platform follows a modern cloud-native data lake architecture.
+The platform follows a modern cloud-native data lake architecture:
 
 ```text
 Data Sources (APIs, Kaggle, CSV, PDFs)
@@ -72,7 +69,7 @@ Data Sources (APIs, Kaggle, CSV, PDFs)
          Amazon QuickSight BI
                     ↓
       Dashboards & ML Predictions
-````
+```
 
 ---
 
@@ -112,28 +109,26 @@ Data Sources (APIs, Kaggle, CSV, PDFs)
 
 Amazon Athena is used to query processed Parquet datasets stored in Amazon S3.
 
-Main analytics include:
+The analytics layer includes:
 
-* Salary trend analysis
-* Skill demand analytics
-* Technology popularity ranking
-* Job market overview queries
-* Salary aggregation by role and technology
+* salary trend analysis,
+* skill demand analysis,
+* technology popularity ranking,
+* job market overview analytics,
+* and salary aggregation by role and technology.
 
-Advanced Athena features used in the project:
+The project also uses advanced Athena features such as:
 
-* Array processing with `UNNEST()`
-* AWS Glue Catalog integration
-* Serverless SQL analytics
-* Querying Parquet datasets directly from S3
+* querying Parquet datasets directly from S3,
+* AWS Glue Catalog integration,
+* serverless SQL analytics,
+* and array processing with `UNNEST()` for skills analysis.
 
 ---
 
 ## Dashboard Design
 
 ### Market Overview Dashboard
-
-Widgets:
 
 * Average salary KPI
 * Total jobs KPI
@@ -143,16 +138,12 @@ Widgets:
 
 ### Skills Analytics Dashboard
 
-Widgets:
-
 * Most popular technologies
 * Skill frequency analysis
 * Salary by skill
 * Technology demand trends
 
 ### Salary Analytics Dashboard
-
-Widgets:
 
 * Salary distribution
 * Salary by country
@@ -167,10 +158,10 @@ The project includes predictive analytics models for salary estimation.
 
 Features used for prediction:
 
-* Job title
-* Technical skills
-* Currency
-* Technology stack
+* job title,
+* technical skills,
+* currency,
+* and technology stack.
 
 Planned machine learning algorithms:
 
@@ -224,18 +215,16 @@ In Progress:
 
 ## Future Improvements
 
-* Real-time job market ingestion
-* Additional ML models
-* Interactive BI dashboards
-* Regional salary forecasting
-* Technology trend prediction
-* Automated ETL scheduling
+Possible future improvements include:
+
+* real-time job market ingestion,
+* automated ETL scheduling,
+* additional machine learning models,
+* interactive BI dashboards,
+* and technology trend forecasting.
 
 ---
 
 ## License
 
 This project is licensed under the Apache-2.0 License.
-
-```
-```
