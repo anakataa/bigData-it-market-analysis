@@ -88,3 +88,40 @@ DESCRIBE cleaned_data;
 SELECT *
 FROM cleaned_data
 LIMIT 10;
+
+-- =========================================
+-- 8. Top paying technical skills
+-- Shows technologies associated with highest salaries
+-- =========================================
+
+SELECT
+    skill,
+    AVG(salary) AS avg_salary,
+    COUNT(*) AS total_jobs
+FROM cleaned_data
+CROSS JOIN UNNEST(skills) AS t(skill)
+GROUP BY skill
+HAVING COUNT(*) > 1
+ORDER BY avg_salary DESC
+LIMIT 10;
+
+-- =========================================
+-- 9. Salary distribution categories
+-- Groups salaries into ranges
+-- =========================================
+
+SELECT
+    CASE
+        WHEN salary < 50000 THEN 'Low Salary'
+        WHEN salary < 100000 THEN 'Medium Salary'
+        ELSE 'High Salary'
+    END AS salary_category,
+    COUNT(*) AS total_jobs
+FROM cleaned_data
+GROUP BY
+    CASE
+        WHEN salary < 50000 THEN 'Low Salary'
+        WHEN salary < 100000 THEN 'Medium Salary'
+        ELSE 'High Salary'
+    END
+ORDER BY total_jobs DESC;
