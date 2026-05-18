@@ -7,3 +7,4 @@ seaborn
 pdfplumber
 pyspark
 python-dotenv
+requests
