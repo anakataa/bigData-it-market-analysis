@@ -6,9 +6,9 @@ import matplotlib.pyplot as plt
 # Load CSV files
 # ==============================
 
-skills_df = pd.read_csv("data/results/top_skills_analysis.csv.csv")
-salary_df = pd.read_csv("data/results/salary_by_role.csv.csv")
-paying_skills_df = pd.read_csv("data/results/top_paying_skills.csv.csv")
+skills_df = pd.read_csv("data/results/top_skills_analysis.csv")
+salary_df = pd.read_csv("data/results/salary_by_role.csv")
+paying_skills_df = pd.read_csv("data/results/top_paying_skills.csv")
 
 
 # ==============================
@@ -17,11 +17,16 @@ paying_skills_df = pd.read_csv("data/results/top_paying_skills.csv.csv")
 
 plt.figure(figsize=(8, 5))
 
-plt.bar(skills_df["skill"], skills_df["demand"])
+plt.bar(
+    skills_df["skill"],
+    skills_df["demand"]
+)
 
 plt.title("Top Demanded Skills")
 plt.xlabel("Skill")
 plt.ylabel("Demand")
+
+plt.xticks(rotation=15)
 
 plt.tight_layout()
 
@@ -36,11 +41,16 @@ plt.close()
 
 plt.figure(figsize=(8, 5))
 
-plt.bar(salary_df["job_title"], salary_df["avg_salary"])
+plt.bar(
+    salary_df["job_title"],
+    salary_df["avg_salary"]
+)
 
 plt.title("Average Salary by Role")
 plt.xlabel("Job Title")
 plt.ylabel("Average Salary")
+
+plt.xticks(rotation=15)
 
 plt.tight_layout()
 
@@ -63,6 +73,8 @@ plt.bar(
 plt.title("Top Paying Skills")
 plt.xlabel("Skill")
 plt.ylabel("Average Salary")
+
+plt.xticks(rotation=15)
 
 plt.tight_layout()
 
