@@ -98,78 +98,6 @@ Data Sources (APIs, Kaggle, CSV, PDFs)
 * Python
 * SQL (Athena / Presto SQL)
 
-### Version Control
-
-* Git
-* GitHub
-
----
-
-## AWS Athena Analytics
-
-Amazon Athena is used to query processed Parquet datasets stored in Amazon S3.
-
-The analytics layer includes:
-
-* salary trend analysis,
-* skill demand analysis,
-* technology popularity ranking,
-* job market overview analytics,
-* and salary aggregation by role and technology.
-
-The project also uses advanced Athena features such as:
-
-* querying Parquet datasets directly from S3,
-* AWS Glue Catalog integration,
-* serverless SQL analytics,
-* and array processing with `UNNEST()` for skills analysis.
-
----
-
-## Dashboard Design
-
-### Market Overview Dashboard
-
-* Average salary KPI
-* Total jobs KPI
-* Salary by role
-* Top demanded skills
-* Currency distribution
-
-### Skills Analytics Dashboard
-
-* Most popular technologies
-* Skill frequency analysis
-* Salary by skill
-* Technology demand trends
-
-### Salary Analytics Dashboard
-
-* Salary distribution
-* Salary by country
-* Salary by role
-* High-paying technologies
-
----
-
-## Machine Learning
-
-The project includes predictive analytics models for salary estimation.
-
-Features used for prediction:
-
-* job title,
-* technical skills,
-* currency,
-* and technology stack.
-
-Planned machine learning algorithms:
-
-* Linear Regression
-* Random Forest Regressor
-
-The goal of the ML component is to predict salary ranges based on job market features and skill combinations.
-
 ---
 
 ## Project Structure
@@ -193,37 +121,6 @@ bigData-it-market-analysis/
 
 ---
 
-## Current Project Status
-
-Completed:
-
-* AWS S3 data lake setup
-* AWS Glue crawler configuration
-* Glue Data Catalog integration
-* Athena SQL analytics
-* Parquet dataset querying
-* Skill demand analysis
-* Salary aggregation queries
-
-In Progress:
-
-* Amazon QuickSight dashboards
-* Machine learning salary prediction
-* Advanced analytics visualizations
-
----
-
-## Future Improvements
-
-Possible future improvements include:
-
-* real-time job market ingestion,
-* automated ETL scheduling,
-* additional machine learning models,
-* interactive BI dashboards,
-* and technology trend forecasting.
-
----
 
 ## License
 
