@@ -12,26 +12,33 @@ paying_skills_df = pd.read_csv("data/results/top_paying_skills.csv")
 
 
 # ==============================
+# Clean column names
+# ==============================
+
+skills_df.columns = skills_df.columns.str.strip()
+salary_df.columns = salary_df.columns.str.strip()
+paying_skills_df.columns = paying_skills_df.columns.str.strip()
+
+
+# ==============================
 # Top demanded skills
 # ==============================
 
-plt.figure(figsize=(8, 5))
+skills_df = skills_df.sort_values("demand", ascending=True).tail(10)
 
-plt.bar(
-    skills_df["skill"],
-    skills_df["demand"]
-)
+plt.figure(figsize=(10, 6))
+plt.barh(skills_df["skill"], skills_df["demand"])
 
-plt.title("Top Demanded Skills")
-plt.xlabel("Skill")
-plt.ylabel("Demand")
+plt.title("Top 10 Most Demanded Skills")
+plt.xlabel("Number of Mentions")
+plt.ylabel("Skill")
+plt.grid(axis="x", alpha=0.3)
 
-plt.xticks(rotation=15)
+for index, value in enumerate(skills_df["demand"]):
+    plt.text(value, index, str(value), va="center")
 
 plt.tight_layout()
-
 plt.savefig("dashboards/top_skills_analysis.png")
-
 plt.close()
 
 
@@ -39,23 +46,23 @@ plt.close()
 # Average salary by role
 # ==============================
 
-plt.figure(figsize=(8, 5))
+role_column = "job_title_clean" if "job_title_clean" in salary_df.columns else "job_title"
 
-plt.bar(
-    salary_df["job_title"],
-    salary_df["avg_salary"]
-)
+salary_df = salary_df.sort_values("avg_salary", ascending=True).tail(10)
 
-plt.title("Average Salary by Role")
-plt.xlabel("Job Title")
-plt.ylabel("Average Salary")
+plt.figure(figsize=(10, 6))
+plt.barh(salary_df[role_column], salary_df["avg_salary"])
 
-plt.xticks(rotation=15)
+plt.title("Top 10 Roles by Average Salary")
+plt.xlabel("Average Salary")
+plt.ylabel("Job Role")
+plt.grid(axis="x", alpha=0.3)
+
+for index, value in enumerate(salary_df["avg_salary"]):
+    plt.text(value, index, f"{value:,.0f}", va="center")
 
 plt.tight_layout()
-
 plt.savefig("dashboards/salary_by_role.png")
-
 plt.close()
 
 
@@ -63,23 +70,21 @@ plt.close()
 # Top paying skills
 # ==============================
 
-plt.figure(figsize=(8, 5))
+paying_skills_df = paying_skills_df.sort_values("avg_salary", ascending=True).tail(10)
 
-plt.bar(
-    paying_skills_df["skill"],
-    paying_skills_df["avg_salary"]
-)
+plt.figure(figsize=(10, 6))
+plt.barh(paying_skills_df["skill"], paying_skills_df["avg_salary"])
 
-plt.title("Top Paying Skills")
-plt.xlabel("Skill")
-plt.ylabel("Average Salary")
+plt.title("Top 10 Highest Paying Skills")
+plt.xlabel("Average Salary")
+plt.ylabel("Skill")
+plt.grid(axis="x", alpha=0.3)
 
-plt.xticks(rotation=15)
+for index, value in enumerate(paying_skills_df["avg_salary"]):
+    plt.text(value, index, f"{value:,.0f}", va="center")
 
 plt.tight_layout()
-
 plt.savefig("dashboards/top_paying_skills.png")
-
 plt.close()
 
 
