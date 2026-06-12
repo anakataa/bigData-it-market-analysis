@@ -1,4 +1,4 @@
-    # Dashboards
+# Dashboards
 
 Final visual outputs of the analytical pipeline — three matplotlib charts and three Athena query
 screenshots that prove the pipeline actually ran.
