@@ -55,7 +55,7 @@ faster, and a lot more honest about what companies will pay for.
 
 ---
 
-## 🏗 Architecture
+## Architecture
 
 The pipeline is fully serverless — no managed clusters, no idle compute, no EC2 to babysit.
 
@@ -144,7 +144,7 @@ visualized in [`dashboards/`](dashboards/).
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```text
 bigData-it-market-analysis/
@@ -187,7 +187,7 @@ bigData-it-market-analysis/
 
 ---
 
-## 🛠 Technology Stack
+## Technology Stack
 
 | Layer              | Tools                                                               |
 | ------------------ | ------------------------------------------------------------------- |
