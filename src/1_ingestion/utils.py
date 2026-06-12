@@ -1,6 +1,7 @@
 # Regular expressions are used for exact skill matching
 # This prevents false positives from partial word matches
 import re
+
 # List of technologies used for skill extraction
 # Vacancy descriptions are scanned for these keywords
 SKILLS = [
@@ -79,27 +80,38 @@ SKILLS = [
     "Looker"
 ]
 
+# Keywords used to detect remote or hybrid vacancies
 REMOTE_KEYWORDS = [
     "remote",
+    "fully remote",
     "work from home",
-    "hybrid"
+    "home office",
+    "hybrid",
+    "zdalnie",
+    "praca zdalna",
+    "praca hybrydowa"
 ]
 
 
 def extract_skills(text: str) -> list:
-     """
+    """
     Extract technologies from vacancy description.
 
     Uses regex-based exact matching to avoid
     detecting technologies inside unrelated words.
     """
-# Return empty result if description missing
+
+    # Return empty result if description missing
     if not text:
         return []
-# Normalize text for case-insensitive matching
+
+    # Normalize text for case-insensitive matching
     text = text.lower()
+
+    # Store detected technologies
     found_skills = []
- # Check every known technology against vacancy text
+
+    # Check every known technology against vacancy text
     for skill in SKILLS:
 
         skill_lower = skill.lower()
@@ -107,14 +119,17 @@ def extract_skills(text: str) -> list:
         # Handle technologies with special symbols
         # Examples: C++, C#, Node.js, CI/CD
         if any(char in skill_lower for char in ["+", "#", ".", "/"]):
+
             # Match exact technology without allowing
             # letters or numbers around it
             pattern = rf"(?<!\w){re.escape(skill_lower)}(?!\w)"
 
         else:
+
             # Use word boundaries for exact matching
             pattern = rf"\b{re.escape(skill_lower)}\b"
-# Add technology if regex match found
+
+        # Add technology if regex match found
         if re.search(pattern, text):
             found_skills.append(skill)
 
@@ -125,10 +140,13 @@ def detect_remote(text: str) -> bool:
     """
     Detect whether vacancy is remote/hybrid.
     """
-# Handle empty descriptions safely
+
+    # Handle empty descriptions safely
     if not text:
         return False
 
+    # Normalize text for case-insensitive matching
     text = text.lower()
 
+    # Return True if any remote keyword is found
     return any(keyword in text for keyword in REMOTE_KEYWORDS)
