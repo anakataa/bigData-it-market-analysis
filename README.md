@@ -179,7 +179,7 @@ bigData-it-market-analysis/
 │   │   └── salary_model.ipynb
 │   └── visualization.py              # Local matplotlib chart generator
 │
-├── README.md                         # ← you are here
+├── README.md                         
 ├── requirements.txt                  # Python dependencies
 ├── .gitignore                        # Excludes .env, venv, __pycache__
 └── LICENSE                           # MIT
