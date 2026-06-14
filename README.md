@@ -66,61 +66,7 @@ Fully serverless — no managed clusters, no idle compute, no EC2 to babysit. Th
 scripts converge into one S3 bronze zone; from there a single Glue Spark job promotes the data
 to columnar Parquet in the silver zone for fast analytics.
 
-```text
-┌──────────────────────┐    ┌──────────────────────┐    ┌──────────────────────┐
-│  Adzuna REST API     │    │  Kaggle CSV          │    │  PDF Reports         │
-│  (US, UK, Poland)    │    │  (DS Salaries 2025)  │    │  (Karat, Stack OF.)  │
-└──────────┬───────────┘    └──────────┬───────────┘    └──────────┬───────────┘
-           │                           │                           │
-           ▼                           ▼                           ▼
-  ┌─────────────────┐         ┌─────────────────┐         ┌─────────────────┐
-  │ adzuna_parser.py│         │ kaggle_loader.py│         │  pdf_parser.py  │
-  │   (NDJSON)      │         │   (NDJSON)      │         │   (NDJSON)      │
-  └────────┬────────┘         └────────┬────────┘         └────────┬────────┘
-           │                           │                           │
-           └───────────────────────────┼───────────────────────────┘
-                                       │
-                                       ▼
-                         ┌─────────────────────────────┐
-                         │  Amazon S3 - Bronze         │
-                         │  s3://.../kstaroshchuk/raw/ │
-                         │  region: eu-north-1         │
-                         └─────────────┬───────────────┘
-                                       │
-                                       ▼
-                         ┌─────────────────────────────┐
-                         │  AWS Glue Spark ETL         │
-                         │  -> Parquet (snappy)        │
-                         │  /processed/cleaned_data/   │
-                         └─────────────┬───────────────┘
-                                       │
-                                       ▼
-                         ┌─────────────────────────────┐
-                         │  AWS Glue Crawler (x2)      │
-                         │  -> it_job_market_db        │
-                         │  -> cleaned_data (NDJSON)   │
-                         │  -> processed_cleaned_data  │
-                         │     (Parquet)               │
-                         └─────────────┬───────────────┘
-                                       │
-                                       ▼
-                         ┌─────────────────────────────┐
-                         │  Amazon Athena (Presto)     │
-                         │  CROSS JOIN UNNEST(skills)  │
-                         │  12 analytical queries      │
-                         └─────────────┬───────────────┘
-                                       │ CSV exports
-                                       ▼
-                ┌──────────────────────┴──────────────────────┐
-                │                                             │
-                ▼                                             ▼
-  ┌──────────────────────────┐              ┌──────────────────────────┐
-  │   Local BI Layer         │              │   ML Layer               │
-  │   visualization.py       │              │   salary_model.ipynb     │
-  │   salary_buckets.py      │              │   LR + Random Forest     │
-  │   -> 4 PNG dashboards    │              │   -> 2 ML charts         │
-  └──────────────────────────┘              └──────────────────────────┘
-```
+![Architecture](dashboards/architecture_diagram_horizontal.png)
 
 > **Note on the original plan:** the initial architecture used Amazon QuickSight as the BI
 > front-end. The QuickSight registration looped repeatedly in `eu-north-1`, so we pivoted to a
