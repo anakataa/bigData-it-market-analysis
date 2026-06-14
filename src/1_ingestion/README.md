@@ -6,6 +6,7 @@ Currently implemented sources:
 
 1. Adzuna REST API
 2. Kaggle Data Science Salaries CSV
+3. PDF salary and technology reports
 
 ---
 
@@ -15,7 +16,8 @@ Currently implemented sources:
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `adzuna_parser.py` | Main entry point for Adzuna ingestion. It collects IT vacancies from the Adzuna API, normalizes salaries, extracts skills, detects remote jobs, writes NDJSON, and uploads the file to S3. |
 | `kaggle_loader.py` | Loads the Kaggle Data Science Salaries CSV file, normalizes salary records to the common project schema, writes NDJSON, and uploads the file to S3.                                        |
-| `utils.py`         | Helper functions for text analysis, mainly skill extraction and remote/hybrid job detection.                                                                                               |
+| `pdf_parser.py`    | Parses text-based PDF reports, extracts technology mentions and salary values, writes page-level NDJSON records, and uploads the file to S3.                                                |
+| `utils.py`         | Helper functions and shared constants for text analysis, mainly skill extraction and remote/hybrid job detection.                                                                          |
 | `s3_uploader.py`   | Reusable `boto3` helper that uploads a local file to the configured S3 bucket.                                                                                                             |
 
 ---
@@ -56,11 +58,32 @@ company_location, company_size
 
 The script uses `salary_in_usd` as the normalized salary value and stores the result in the same raw S3 area as Adzuna job data.
 
+### PDF salary and technology reports
+
+The PDF ingestion script parses text-based PDF reports about the IT market, developer salaries, technology demand, and skill trends.
+
+Expected local input folder:
+
+```text
+data/pdf_reports/
+```
+
+Example PDF reports:
+
+```text
+engineering_salary_benchmark_report_2024.pdf
+stack_overflow_developer_survey_2024.pdf
+```
+
+The script scans every PDF page, extracts known technology skills from the shared `SKILLS` list, finds salary mentions such as `$120,000`, `$120K`, or `USD 120000`, removes unrealistic values, and writes one NDJSON record per useful page.
+
+PDF files are local input files and should not be committed to Git.
+
 ---
 
-## Common output schema
+## Common job-market output schema
 
-Both ingestion scripts produce records that follow a common job-market schema.
+Adzuna and Kaggle ingestion scripts produce records that follow a common job-market schema.
 
 Example Adzuna record:
 
@@ -104,6 +127,27 @@ Example Kaggle record:
 
 ---
 
+## PDF report output schema
+
+PDF report ingestion produces page-level analytical records. This output is stored separately from raw job postings because PDF pages are report evidence, not individual vacancies.
+
+Example PDF record:
+
+```json
+{
+  "source_file": "stackoverflow_developer_survey_2024.pdf",
+  "page": 3,
+  "skills": ["Python", "SQL", "AWS", "Docker", "Kubernetes"],
+  "salary_mentions": [95000, 110000, 120000],
+  "avg_salary_on_page": 108333,
+  "text_snippet": "Top Skills by Demand and Pay Skill Demand Rank Median Salary...",
+  "source": "PDF-Report",
+  "collected_at": "2026-06-14"
+}
+```
+
+---
+
 ## Normalization rules
 
 ### Adzuna normalization
@@ -141,8 +185,33 @@ Example Kaggle record:
 | `source`           | Always `Kaggle-DS-Salaries`.                                                                            |
 | `collected_at`     | Current run date in `YYYY-MM-DD` format.                                                                |
 
----
+### PDF report normalization
 
+| Field                | Rule                                                                                                      |
+| -------------------- | --------------------------------------------------------------------------------------------------------- |
+| `source_file`        | Name of the parsed PDF file.                                                                              |
+| `page`               | Page number in the PDF, starting from 1.                                                                  |
+| `skills`             | Technologies detected on the page using the curated `SKILLS` list in `utils.py`.                          |
+| `salary_mentions`    | Salary values extracted from the page text and converted to integers.                                     |
+| `avg_salary_on_page` | Rounded average of `salary_mentions`, or `null` if the page has no salary values.                         |
+| `text_snippet`       | First 500 characters of normalized page text, useful for debugging and source tracing.                    |
+| `source`             | Always `PDF-Report`.                                                                                      |
+| `collected_at`       | Current run date in `YYYY-MM-DD` format.                                                                  |
+
+Salary extraction supports formats such as:
+
+```text
+$120,000
+$120.000
+$120K
+$120k
+USD 120000
+USD 120,000
+```
+
+Values below `20000` and above `1000000` are skipped to avoid years, page numbers, and unrealistic outliers.
+
+---
 
 ## How to run
 
@@ -182,6 +251,25 @@ data/raw_samples/kaggle_salaries_YYYY_MM_DD.ndjson
 s3://$S3_BUCKET_NAME/raw/jobs/kaggle_salaries_YYYY_MM_DD.ndjson
 ```
 
+### Run PDF report ingestion
+
+First, place at least two text-based PDF reports here:
+
+```text
+data/pdf_reports/
+```
+
+Then run:
+
+```bash
+python src/1_ingestion/pdf_parser.py
+```
+
+Output:
+
+```text
+data/raw_samples/pdf_reports_YYYY_MM_DD.ndjson
+s3://$S3_BUCKET_NAME/raw/pdf/pdf_reports_YYYY_MM_DD.ndjson
+```
+
 ---
-
-
