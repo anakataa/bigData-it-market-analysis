@@ -1,32 +1,68 @@
 # 1. Ingestion Layer
 
-The first stage of the pipeline: pull live IT vacancies from the [Adzuna REST API](https://developer.adzuna.com/),
-normalize them, and upload them as NDJSON to the project's S3 raw zone.
+The first stage of the pipeline collects raw IT job market data from multiple sources, normalizes it into a common schema, saves it locally as NDJSON, and uploads it to the project's S3 raw zone.
+
+Currently implemented sources:
+
+1. Adzuna REST API
+2. Kaggle Data Science Salaries CSV
+
+---
 
 ## Files
 
-| File               | Purpose                                                                                                              |
-| ------------------ | -------------------------------------------------------------------------------------------------------------------- |
-| `adzuna_parser.py` | Main entry point. Iterates over countries/pages, normalizes each vacancy, writes NDJSON, and triggers the S3 upload. |
-| `utils.py`         | Pure helpers: skill extraction (regex over a curated tech list) and remote/hybrid detection (keyword scan).          |
-| `s3_uploader.py`   | Thin `boto3` wrapper that uploads a local file to the configured S3 bucket.                                          |
+| File               | Purpose                                                                                                                                                                                    |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `adzuna_parser.py` | Main entry point for Adzuna ingestion. It collects IT vacancies from the Adzuna API, normalizes salaries, extracts skills, detects remote jobs, writes NDJSON, and uploads the file to S3. |
+| `kaggle_loader.py` | Loads the Kaggle Data Science Salaries CSV file, normalizes salary records to the common project schema, writes NDJSON, and uploads the file to S3.                                        |
+| `utils.py`         | Helper functions for text analysis, mainly skill extraction and remote/hybrid job detection.                                                                                               |
+| `s3_uploader.py`   | Reusable `boto3` helper that uploads a local file to the configured S3 bucket.                                                                                                             |
 
-## What gets collected
+---
 
-The scraper queries Adzuna for **three countries** by default:
+## Data sources
 
-| Country code | Region         | Default currency       |
-| ------------ | -------------- | ---------------------- |
-| `us`         | United States  | USD                    |
-| `gb`         | United Kingdom | GBP → converted to USD |
-| `pl`         | Poland         | PLN → converted to USD |
+### Adzuna REST API
 
-Up to **120 pages × 50 results** per country (= ~18,000 raw listings per run). After normalization
-and the "must mention ≥ 2 known skills" filter, the typical batch settles around 500 technical vacancies.
+The Adzuna ingestion script collects live IT vacancies from selected countries.
 
-## Normalization
+Default countries:
 
-Each raw API record becomes a clean object with the following shape:
+| Country code | Region         | Default currency |
+| ------------ | -------------- | ---------------- |
+| `us`         | United States  | USD              |
+| `gb`         | United Kingdom | GBP              |
+| `pl`         | Poland         | PLN              |
+
+The script fetches multiple pages of vacancies, normalizes each job offer, filters records by known technical skills, and saves the result as NDJSON.
+
+### Kaggle Data Science Salaries CSV
+
+The Kaggle ingestion script loads a local CSV file with salary records for data and IT-related roles.
+
+Expected local input file:
+
+```text
+data/raw_samples/data_science_salaries.csv
+```
+
+The dataset contains columns such as:
+
+```text
+job_title, experience_level, employment_type, work_models, work_year,
+employee_residence, salary, salary_currency, salary_in_usd,
+company_location, company_size
+```
+
+The script uses `salary_in_usd` as the normalized salary value and stores the result in the same raw S3 area as Adzuna job data.
+
+---
+
+## Common output schema
+
+Both ingestion scripts produce records that follow a common job-market schema.
+
+Example Adzuna record:
 
 ```json
 {
@@ -40,38 +76,79 @@ Each raw API record becomes a clean object with the following shape:
   "skills": ["Python", "AWS", "Spark"],
   "description": "...",
   "source": "Adzuna",
-  "collected_at": "2026-05-18"
+  "collected_at": "2026-06-14"
 }
 ```
 
-Key normalization rules:
+Example Kaggle record:
 
-- **Salary** → converted to **USD per year** regardless of original currency or period (hour/day/month/year).
-- **Skills** → extracted via word-boundary regex against a curated list of ~80 technologies (see `utils.py`).
-  Special tokens like `C++`, `C#`, `Node.js`, `CI/CD` are matched with non-word lookarounds to avoid
-  false positives.
-- **Remote** → boolean. Detects English ("remote", "hybrid", "work from home") and Polish
-  ("zdalnie", "praca zdalna", "praca hybrydowa") keywords.
-
-## Environment variables
-
-Create a `.env` file at the repo root with the following keys:
-
-```env
-ADZUNA_APP_ID=your_app_id
-ADZUNA_APP_KEY=your_app_key
-
-AWS_ACCESS_KEY_ID=your_aws_key
-AWS_SECRET_ACCESS_KEY=your_aws_secret
-AWS_REGION=eu-north-1
-S3_BUCKET_NAME=your-bucket-name
+```json
+{
+  "job_title": "Data Engineer",
+  "company": null,
+  "location": "United States",
+  "salary_min": 95000.0,
+  "salary_max": 95000.0,
+  "currency": "USD",
+  "remote": true,
+  "skills": [],
+  "description": null,
+  "experience_level": "Senior-level",
+  "employment_type": "Full-time",
+  "company_size": "Large",
+  "work_year": 2024,
+  "source": "Kaggle-DS-Salaries",
+  "collected_at": "2026-06-14"
+}
 ```
 
-Get your Adzuna credentials from <https://developer.adzuna.com/> (the free tier is sufficient).
+---
+
+## Normalization rules
+
+### Adzuna normalization
+
+| Field                       | Rule                                                                                |
+| --------------------------- | ----------------------------------------------------------------------------------- |
+| `job_title`                 | Taken from the Adzuna vacancy title.                                                |
+| `company`                   | Taken from Adzuna company data.                                                     |
+| `location`                  | Taken from Adzuna location data.                                                    |
+| `salary_min` / `salary_max` | Extracted from Adzuna salary fields and converted to yearly USD values.             |
+| `currency`                  | Normalized to `USD`.                                                                |
+| `remote`                    | Detected from title and description keywords.                                       |
+| `skills`                    | Extracted from title and description using the curated `SKILLS` list in `utils.py`. |
+| `description`               | Taken from the Adzuna vacancy description.                                          |
+| `source`                    | Always `Adzuna`.                                                                    |
+| `collected_at`              | Current run date in `YYYY-MM-DD` format.                                            |
+
+### Kaggle normalization
+
+| Field              | Rule                                                                                                    |
+| ------------------ | ------------------------------------------------------------------------------------------------------- |
+| `job_title`        | Taken from the CSV `job_title` column.                                                                  |
+| `company`          | Set to `null`, because the dataset does not contain company names.                                      |
+| `location`         | Taken from `company_location`.                                                                          |
+| `salary_min`       | Taken from `salary_in_usd`.                                                                             |
+| `salary_max`       | Same value as `salary_min`, because the dataset contains point salary values, not salary ranges.        |
+| `currency`         | Always `USD`.                                                                                           |
+| `remote`           | `true` if `work_models` is `Remote` or `Hybrid`; otherwise `false`.                                     |
+| `skills`           | Empty list `[]`, because the dataset does not contain skills.                                           |
+| `description`      | Set to `null`, because the dataset does not contain job descriptions.                                   |
+| `experience_level` | Taken directly from the CSV, for example `Entry-level`, `Mid-level`, `Senior-level`, `Executive-level`. |
+| `employment_type`  | Taken directly from the CSV, for example `Full-time`, `Part-time`, `Contract`, `Freelance`.             |
+| `company_size`     | Taken directly from the CSV, for example `Small`, `Medium`, `Large`.                                    |
+| `work_year`        | Taken from the CSV `work_year` column.                                                                  |
+| `source`           | Always `Kaggle-DS-Salaries`.                                                                            |
+| `collected_at`     | Current run date in `YYYY-MM-DD` format.                                                                |
+
+---
+
 
 ## How to run
 
-From the **repo root** (not from inside this folder):
+Run all commands from the project root, not from inside `src/1_ingestion/`.
+
+### Run Adzuna ingestion
 
 ```bash
 python src/1_ingestion/adzuna_parser.py
@@ -79,14 +156,32 @@ python src/1_ingestion/adzuna_parser.py
 
 Output:
 
-- Local: `data/raw_samples/jobs_YYYY_MM_DD.ndjson`
-- Remote: `s3://$S3_BUCKET_NAME/raw/jobs/jobs_YYYY_MM_DD.ndjson`
+```text
+data/raw_samples/jobs_YYYY_MM_DD.ndjson
+s3://$S3_BUCKET_NAME/raw/jobs/jobs_YYYY_MM_DD.ndjson
+```
 
-The script appends to the local file (does not overwrite), so a partial run can resume safely.
+### Run Kaggle CSV ingestion
 
-## Troubleshooting
+First, place the Kaggle CSV file here:
 
-- `401 Unauthorized` → check your Adzuna `app_id` / `app_key`.
-- `AccessDenied` on upload → the IAM user must have `s3:PutObject` on the target bucket.
-- Empty file → the "≥ 2 skills" filter is strict; widen the `SKILLS` list in `utils.py` if you
-  need more coverage.
+```text
+data/raw_samples/data_science_salaries.csv
+```
+
+Then run:
+
+```bash
+python src/1_ingestion/kaggle_loader.py
+```
+
+Output:
+
+```text
+data/raw_samples/kaggle_salaries_YYYY_MM_DD.ndjson
+s3://$S3_BUCKET_NAME/raw/jobs/kaggle_salaries_YYYY_MM_DD.ndjson
+```
+
+---
+
+
