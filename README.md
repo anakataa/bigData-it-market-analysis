@@ -25,8 +25,6 @@
 - [Technology Stack](#technology-stack)
 - [Quick Start](#quick-start)
 - [Documentation](#documentation)
-- [Course Criteria Mapping](#course-criteria-mapping)
-- [License](#license)
 
 ---
 
