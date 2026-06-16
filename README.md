@@ -60,6 +60,76 @@ faster, and a lot more honest about what companies will pay for.
 
 ---
 
+## Individual Contributions
+ 
+Each engineer owned a clearly defined layer of the pipeline end-to-end.
+
+### Kirill Staroshchuk — Project Lead & Cloud Architect
+ 
+Responsible for the **architectural design, AWS infrastructure provisioning, team
+coordination, and project documentation**:
+ 
+- **Cloud Architecture** — designed the end-to-end serverless pipeline on AWS (S3 → Glue →
+  Athena → Python BI). Provisioned the S3 bucket in `eu-north-1` with the bronze/silver
+  zones layout that lets both Glue Crawlers operate independently.
+- **AWS IAM** — designed the least-privilege identity model (per-user IAM accounts plus the
+  `Glue-S3-Project-Role` service role); resolved the initial `iam:PassRole` permission gap
+  that blocked the first Crawler run; standardized secret management through `.env`.
+- **Team Coordination** — defined per-layer ownership, coordinated milestones, managed risk
+  during the two main incidents (QuickSight regional registration loop, salary FX outlier
+  discovery).
+- **Documentation** — authored this README, the 14-section technical Word document, the
+  dedicated `ARCHITECTURE.md`, per-folder READMEs inside `src/`, and the 13-slide PowerPoint
+  presentation.
+**Technologies:** AWS S3, AWS Glue, Amazon Athena, AWS IAM, Git, GitHub, Microsoft Word,
+Microsoft PowerPoint.
+
+---
+
+### Mykhailo Bitiukov — Data Acquisition Engineer
+ 
+Responsible for the **Ingestion Layer (Layer 1)** — three independent data sources, all
+normalized into a single unified NDJSON schema:
+ 
+- **`adzuna_parser.py`** — multi-country REST API scraper (US / UK / Poland), handles
+  pagination, filters non-technical postings (≥ 2 known skills), converts every salary
+  to USD per year, detects remote work in English and Polish keywords.
+- **`kaggle_loader.py`** — flat-file CSV ingestion of the Kaggle "Data Science Salaries 2025"
+  dataset; maps Kaggle's experience/company-size codes to human-readable labels.
+- **`pdf_parser.py`** — PDF parsing with `pdfplumber`; extracts technology mentions through
+  regex matching and salary mentions through a numeric pattern, filtering noise.
+- **`utils.py` + `s3_uploader.py`** — shared skill-vocabulary and boto3-based S3 uploader.
+**Technologies:** Python 3.10+, requests, pdfplumber, boto3, python-dotenv, AWS S3, GitHub.
+ 
+---
+ 
+### Dmytro Buran — Cloud Data Engineer & BI Analyst
+ 
+Responsible for the **Transformation, Serving, and Analytics layers** — everything downstream
+of the S3 bronze zone:
+ 
+- **AWS Glue ETL** — created and executed a Glue Spark ETL job that transforms raw NDJSON
+  into optimized Parquet files; implemented salary cleaning logic, calculated salary
+  midpoints from ranges, filtered invalid records.
+- **AWS Glue Crawler and Data Catalog** — configured a second Crawler for the processed
+  Parquet layer; both raw and processed datasets are queryable in Athena via
+  `it_job_market_db.cleaned_data` and `it_job_market_db.processed_cleaned_data`.
+- **Amazon Athena Analytics** — wrote and validated 12 production SQL queries covering skill
+  demand, salary by role, remote vs office comparison, salary bucket categorization, and
+  country-based salary comparison.
+- **Data Visualization (BI Layer)** — used Python for data visualization. The analytical
+  data was prepared using AWS Athena and pandas, and the dashboards were generated with
+  matplotlib. Created and updated four analytical dashboards (Top Skills, Salary by Role,
+  Top Paying Skills, Salary Bucket Analysis). Also reviewed salary data quality and corrected
+  the visualizations by removing unrealistic salary outliers (the PLN-as-USD currency bug).
+- **ML Extension** — implemented a salary prediction model using Python and scikit-learn:
+  feature engineering, training of LinearRegression + RandomForestRegressor, evaluation
+  using MAE, RMSE, R², and visualization of model performance and feature importance.
+**Technologies:** Amazon S3, AWS Glue, AWS Glue Crawlers, Amazon Athena, Python, pandas,
+matplotlib, scikit-learn, GitHub.
+ 
+---
+ 
 ## Architecture
 
 Fully serverless — no managed clusters, no idle compute, no EC2 to babysit. Three ingestion
